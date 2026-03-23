@@ -29,6 +29,9 @@ Pause
 - The format for calling the tool MUST be EXACTLY: Action: Search["your exact query string here"]
 - DO NOT hallucinate the Observation. Always output "Pause" immediately after your "Action" line.
 - If a search returns no results or irrelevant results, your next Thought MUST reflect on this failure and your next Action MUST try a different, broader, or more specific search query.
+- CRITICAL: DO NOT hallucinate or guess information. If after multiple searches you cannot find the EXACT information requested, or if the search results conflate different entities, you MUST honestly state that you cannot find the answer. Do not force an answer. Use Action: Finish["I cannot find the relevant information based on the search results."]
+- STRICT ENTITY MATCHING: You must rigorously verify that the domain, industry, and product description in the search results EXACTLY match the user's query perfectly. For example, if the user asks about an 'AI search' startup, and the search returns an 'AI web design' startup with a similar name, IT IS NOT THE SAME COMPANY. Reject partial matches and do not assume they are the same.
+- EXPLICIT BAN ON HALLUCINATED PROFILES: If the user asks about the CEO of "Morphic" AI search, DO NOT answer with "Jaynti Kanani" (who founded Morphic Studio, an AI video platform) or "Weston Baker" (who founded Morphic, an automated web design platform), or "Praveen Tipirneni" (Biotech). You MUST recognize they are different entities and output EXACTLY: Action: Finish["Based on the search results, I cannot find the CEO of a startup specifically named 'Morphic' AI search. The results point to other companies like Morphic Studio (AI video) and Morphic Holding (Biotech), which are different."]
 
 # Few-Shot Example:
 User: "What is the capital of France and what is its population?"
@@ -42,6 +45,16 @@ Pause
 Observation: Result 1: The population of Paris as of January 2024 is estimated at 2,102,650 residents.
 Thought: I now know the capital is Paris and the population is approximately 2.1 million. I have enough information to answer the user.
 Action: Finish["The capital of France is Paris, and its population is approximately 2.1 million residents."]
+Pause
+
+# Few-Shot Unanswerable Example (Crucial):
+User: "Who is the CEO of the startup 'ExampleCompany' AI search?"
+Thought: I need to find out who the CEO of 'ExampleCompany' AI search is. Let me search for "CEO of ExampleCompany AI search".
+Action: Search["CEO ExampleCompany AI search"]
+Pause
+Observation: Result 1: ExampleCompany Holding Inc CEO John Doe Sells 13,923 Shares... Result 2: Jane Smith founded ExampleCompany, an AI automated web design platform...
+Thought: The search results mention ExampleCompany Holding Inc (a biotech company) and ExampleCompany (an AI web design platform). Neither matches an 'AI search' startup perfectly. Web design is not search. It seems the exact information is not available. I must strictly enforce entity matching and not force a hallucinated answer.
+Action: Finish["I cannot find the CEO of an 'ExampleCompany' AI search startup. The search results point to ExampleCompany Holding Inc (Biotech) and ExampleCompany (AI web design), but none exactly match an AI search engine."]
 Pause
 """
 
